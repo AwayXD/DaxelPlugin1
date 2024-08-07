@@ -111,7 +111,7 @@ public class ItemEventListener implements Listener {
                     String name = event.getEntity().getName();
                     if (Math.random() < 0.20) { // 20% chance
                         event.setDamage(event.getDamage() * 2); // Double damage
-                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7 dealing &c" + event.getDamage() + " &7damage!"));
+                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7!"));
                     }
                 }
             }
