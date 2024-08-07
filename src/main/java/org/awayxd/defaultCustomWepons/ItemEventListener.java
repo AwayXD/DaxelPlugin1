@@ -1,6 +1,7 @@
 package org.awayxd.defaultCustomWepons;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -12,9 +13,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +23,11 @@ import java.util.UUID;
 public class ItemEventListener implements Listener {
     private final JavaPlugin plugin;
     private final Map<UUID, Long> equilonisCooldowns = new HashMap<>();
+    private final int fireRadius = 10; // Define the radius of the fire here
 
     public ItemEventListener(JavaPlugin plugin) {
         this.plugin = plugin;
+        startActionBarUpdater();
     }
 
     @EventHandler
@@ -61,8 +63,8 @@ public class ItemEventListener implements Listener {
                     // Show red particle ring
                     for (int i = 0; i < 360; i += 10) {
                         double angle = i * Math.PI / 180;
-                        double x = 10 * Math.cos(angle);
-                        double z = 10 * Math.sin(angle);
+                        double x = fireRadius * Math.cos(angle);
+                        double z = fireRadius * Math.sin(angle);
                         player.getWorld().spawnParticle(Particle.FLAME, player.getLocation().add(x, 0, z), 1, new Particle.DustOptions(org.bukkit.Color.RED, 1));
                     }
 
@@ -115,6 +117,36 @@ public class ItemEventListener implements Listener {
                         player.sendMessage("Aerothorn dealt double damage: " + damage);
                     } else {
                         player.sendMessage("Aerothorn dealt normal damage: " + event.getDamage());
+                    }
+                }
+            }
+        }
+    }
+
+    private void startActionBarUpdater() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateActionBars();
+            }
+        }.runTaskTimer(plugin, 0L, 20L); // Update every second
+    }
+
+    private void updateActionBars() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+                String itemName = item.getItemMeta().getDisplayName();
+                if (itemName.equals("Equilonis")) {
+                    UUID playerId = player.getUniqueId();
+                    long currentTime = System.currentTimeMillis();
+                    long lastUsed = equilonisCooldowns.getOrDefault(playerId, 0L);
+                    long timeLeft = (120000 - (currentTime - lastUsed)) / 1000; // Time left in seconds
+
+                    if (timeLeft > 0) {
+                        player.sendActionBar(ChatColor.RED + "Cooldown: " + timeLeft + "s | Fire Radius: " + fireRadius + " blocks");
+                    } else {
+                        player.sendActionBar(ChatColor.GREEN + "Ready! | Fire Radius: " + fireRadius + " blocks");
                     }
                 }
             }
