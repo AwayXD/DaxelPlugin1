@@ -1,8 +1,8 @@
 package org.awayxd.defaultCustomWepons;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,12 +14,11 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.bukkit.Bukkit.getName;
 
 public class ItemEventListener implements Listener {
     private final JavaPlugin plugin;
@@ -41,6 +40,7 @@ public class ItemEventListener implements Listener {
         String itemName = item.getItemMeta().getDisplayName();
 
         if (itemName.equals("Luminatra")) {
+            // Implement Luminatra functionality
             event.setCancelled(true); // Cancel the shield block to trigger custom behavior
             player.getNearbyEntities(3, 3, 3).forEach(entity -> {
                 if (entity instanceof LivingEntity) {
@@ -49,24 +49,36 @@ public class ItemEventListener implements Listener {
             });
             item.setDurability((short) (item.getDurability() + 1)); // Custom durability handling
         } else if (itemName.equals("Equilonis")) {
+            // Implement Equilonis functionality
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 UUID playerId = player.getUniqueId();
                 long currentTime = System.currentTimeMillis();
                 long lastUsed = equilonisCooldowns.getOrDefault(playerId, 0L);
 
-                if (currentTime - lastUsed >= 5000) { // 2 minutes cooldown
+                if (currentTime - lastUsed >= 120000) { // 2 minutes cooldown
                     equilonisCooldowns.put(playerId, currentTime);
+
+                    // Show red particle ring
+                    for (int i = 0; i < 360; i += 10) {
+                        double angle = i * Math.PI / 180;
+                        double x = 10 * Math.cos(angle);
+                        double z = 10 * Math.sin(angle);
+                        player.getWorld().spawnParticle(Particle.FLAME, player.getLocation().add(x, 0, z), 1, new Particle.DustOptions(org.bukkit.Color.RED, 1));
+                    }
+
                     player.getNearbyEntities(10, 10, 10).forEach(entity -> {
                         if (entity instanceof LivingEntity) {
-                            entity.setFireTicks(200); // Set on fire for 10 seconds
+                            ((LivingEntity) entity).setFireTicks(200); // Set on fire for 10 seconds
                         }
                     });
                     item.setDurability((short) (item.getDurability() + 1)); // Custom durability handling
                 }
             }
         } else if (itemName.equals("Sylvora")) {
+            // Implement Sylvora functionality
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 event.getClickedBlock().setType(Material.DIRT); // Reverts tilled land to dirt
+                // Logic to speed up crop growth (simplified example)
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     event.getClickedBlock().setType(Material.DIRT); // Revert after 10 minutes
                 }, 12000L); // 10 minutes in ticks
@@ -97,10 +109,12 @@ public class ItemEventListener implements Listener {
                 String itemName = item.getItemMeta().getDisplayName();
                 if (itemName.equals("Aerothorn")) {
                     // Implement Aerothorn functionality
-                    String name = event.getEntity().getName();
-                    if (Math.random() < 0.20) { // 20% chance
-                        event.setDamage(event.getDamage() * 2); // Double damage
-                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7 dealing &c" + event.getDamage() + " &7damage!"));
+                    if (Math.random() < 0.05) { // 5% chance
+                        double damage = event.getDamage() * 2;
+                        event.setDamage(damage); // Double damage
+                        player.sendMessage("Aerothorn dealt double damage: " + damage);
+                    } else {
+                        player.sendMessage("Aerothorn dealt normal damage: " + event.getDamage());
                     }
                 }
             }
