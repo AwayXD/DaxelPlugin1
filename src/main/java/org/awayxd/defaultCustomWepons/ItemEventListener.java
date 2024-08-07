@@ -52,7 +52,7 @@ public class ItemEventListener implements Listener {
                 long currentTime = System.currentTimeMillis();
                 long lastUsed = equilonisCooldowns.getOrDefault(playerId, 0L);
 
-                if (currentTime - lastUsed >= 120000) { // 2 minutes cooldown
+                if (currentTime - lastUsed >= 5000) { // 2 minutes cooldown
                     equilonisCooldowns.put(playerId, currentTime);
                     player.getNearbyEntities(10, 10, 10).forEach(entity -> {
                         if (entity instanceof LivingEntity) {
