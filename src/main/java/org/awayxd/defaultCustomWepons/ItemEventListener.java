@@ -101,20 +101,17 @@ public class ItemEventListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player) {
-            Player player = (Player) event.getDamager();
+        if (event.getDamager() instanceof Player player) {
             ItemStack item = player.getInventory().getItemInMainHand();
 
-            if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+            if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
                 String itemName = item.getItemMeta().getDisplayName();
                 if (itemName.equals("Aerothorn")) {
                     // Implement Aerothorn functionality
-                    if (Math.random() < 0.05) { // 5% chance
-                        double damage = event.getDamage() * 2;
-                        event.setDamage(damage); // Double damage
-                        player.sendMessage("Aerothorn dealt double damage: " + damage);
-                    } else {
-                        player.sendMessage("Aerothorn dealt normal damage: " + event.getDamage());
+                    String name = event.getEntity().getName();
+                    if (Math.random() < 0.20) { // 20% chance
+                        event.setDamage(event.getDamage() * 2); // Double damage
+                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7 dealing &c" + event.getDamage() + " &7damage!"));
                     }
                 }
             }
