@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.bukkit.Bukkit.getName;
+
 public class ItemEventListener implements Listener {
     private final JavaPlugin plugin;
     private final Map<UUID, Long> equilonisCooldowns = new HashMap<>();
@@ -56,7 +58,7 @@ public class ItemEventListener implements Listener {
                     equilonisCooldowns.put(playerId, currentTime);
                     player.getNearbyEntities(10, 10, 10).forEach(entity -> {
                         if (entity instanceof LivingEntity) {
-                            ((LivingEntity) entity).setFireTicks(200); // Set on fire for 10 seconds
+                            entity.setFireTicks(200); // Set on fire for 10 seconds
                         }
                     });
                     item.setDurability((short) (item.getDurability() + 1)); // Custom durability handling
@@ -95,10 +97,11 @@ public class ItemEventListener implements Listener {
                 String itemName = item.getItemMeta().getDisplayName();
                 if (itemName.equals("Aerothorn")) {
                     // Implement Aerothorn functionality
-                    if (Math.random() < 0.20) { // 5% chance
+                    String name = event.getEntity().getName();
+                    if (Math.random() < 0.20) { // 20% chance
                         event.setDamage(event.getDamage() * 2); // Double damage
+                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7 dealing &c" + event.getDamage() + " &7damage!"));
                     }
-                    player.sendMessage(ChatColor.GREEN + "You dealt " + event.getDamage() + " damage to " + ((LivingEntity) event.getEntity()).getName());
                 }
             }
         }

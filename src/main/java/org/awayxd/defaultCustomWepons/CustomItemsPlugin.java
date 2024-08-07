@@ -1,5 +1,6 @@
 package org.awayxd.defaultCustomWepons;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -67,5 +68,9 @@ public class CustomItemsPlugin extends JavaPlugin {
             return true;
         }
         return false;
+    }
+
+    public static String colorCode(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 }
