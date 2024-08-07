@@ -44,7 +44,7 @@ public class CustomItemsPlugin extends JavaPlugin {
                     item = new ItemStack(Material.SHIELD);
                     break;
                 case "equilonis":
-                    item = new ItemStack(Material.FIRE_CHARGE);
+                    item = new ItemStack(Material.EMERALD);
                     break;
                 case "sylvora":
                     item = new ItemStack(Material.WOODEN_HOE);

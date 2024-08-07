@@ -13,7 +13,7 @@ public class CustomItems {
     }
 
     public static ItemStack createEquilonis() {
-        ItemStack item = new ItemStack(Material.FIRE_CHARGE);
+        ItemStack item = new ItemStack(Material.EMERALD);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("Equilonis");
         item.setItemMeta(meta);
