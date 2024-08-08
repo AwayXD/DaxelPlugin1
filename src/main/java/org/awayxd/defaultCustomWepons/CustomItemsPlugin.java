@@ -27,7 +27,7 @@ public class CustomItemsPlugin extends JavaPlugin {
         if (command.getName().equalsIgnoreCase("givecustomitem")) {
             if (args.length != 2) {
                 sender.sendMessage("Usage: /givecustomitem <item> <player>");
-                return false;
+                return true;
             }
 
             String itemName = args[0];
