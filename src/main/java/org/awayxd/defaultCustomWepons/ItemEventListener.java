@@ -22,6 +22,7 @@ import java.util.UUID;
 
 public class ItemEventListener implements Listener {
     private final JavaPlugin plugin;
+    private final Map<UUID, Boolean> playerBlocking = new HashMap<>();
     private final Map<UUID, Long> equilonisCooldowns = new HashMap<>();
     private final int fireRadius = 10; // Define the radius of the fire here
 
@@ -42,14 +43,10 @@ public class ItemEventListener implements Listener {
         String itemName = item.getItemMeta().getDisplayName();
 
         if (itemName.equals("Luminatra")) {
-            // Implement Luminatra functionality
-            event.setCancelled(true); // Cancel the shield block to trigger custom behavior
-            player.getNearbyEntities(3, 3, 3).forEach(entity -> {
-                if (entity instanceof LivingEntity) {
-                    entity.setVelocity(entity.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(1.5));
-                }
-            });
-            item.setDurability((short) (item.getDurability() + 1)); // Custom durability handling
+            // Track if player is blocking with a shield
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+                playerBlocking.put(player.getUniqueId(), player.isBlocking());
+            }
         } else if (itemName.equals("Equilonis")) {
             // Implement Equilonis functionality
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -103,17 +100,29 @@ public class ItemEventListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player player) {
-            ItemStack item = player.getInventory().getItemInMainHand();
+        if (event.getDamager() instanceof Player attacker && event.getEntity() instanceof Player target) {
+            ItemStack item = attacker.getInventory().getItemInMainHand();
 
             if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
                 String itemName = item.getItemMeta().getDisplayName();
-                if (itemName.equals("Aerothorn")) {
+                if (itemName.equals("Luminatra")) {
+                    // Check if the target player was blocking with a shield
+                    if (playerBlocking.getOrDefault(target.getUniqueId(), false) && target.isBlocking()) {
+                        // Implement Luminatra functionality
+                        event.setCancelled(true); // Cancel the damage to trigger custom behavior
+                        // Apply velocity to the attacker, making sure it's significant enough to be noticeable
+                        attacker.setVelocity(attacker.getLocation().toVector().subtract(target.getLocation().toVector()).normalize().multiply(2.0));
+                        attacker.sendMessage(ChatColor.RED + "You have been flung back!");
+                        item.setDurability((short) (item.getDurability() + 1)); // Custom durability handling
+                    }
+                    // Reset the blocking status
+                    playerBlocking.put(target.getUniqueId(), false);
+                } else if (itemName.equals("Aerothorn")) {
                     // Implement Aerothorn functionality
                     String name = event.getEntity().getName();
                     if (Math.random() < 0.20) { // 20% chance
                         event.setDamage(event.getDamage() * 2); // Double damage
-                        player.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7!"));
+                        attacker.sendMessage(CustomItemsPlugin.colorCode("&4│ &7You dealt &c2x &7damage to &c" + name + "&7!"));
                     }
                 }
             }
